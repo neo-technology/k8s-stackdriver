@@ -3,6 +3,7 @@ package stackdriver
 import (
 	"cloud.google.com/go/compute/metadata"
 	"fmt"
+	"github.com/GoogleCloudPlatform/k8s-stackdriver/event-exporter/utils"
 	"github.com/golang/glog"
 	"strings"
 )
@@ -15,19 +16,19 @@ type monitoredResourceFactoryConfig struct {
 }
 
 func newMonitoredResourceFactoryConfig(resourceModelVersion string) (*monitoredResourceFactoryConfig, error) {
-	clusterName, err := metadata.InstanceAttributeValue("cluster-name")
+	clusterName, err := utils.GetClusterName()
 	if err != nil {
 		glog.Warningf("'cluster-name' label is not specified on the VM, defaulting to the empty value")
 		clusterName = ""
 	}
 	clusterName = strings.TrimSpace(clusterName)
 
-	projectID, err := metadata.ProjectID()
+	projectID, err := utils.GetProjectID()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get project id: %v", err)
 	}
 
-	location, err := metadata.InstanceAttributeValue("cluster-location")
+	location, err := utils.GetClusterLocation()
 	location = strings.TrimSpace(location)
 	if err != nil || location == "" {
 		glog.Warningf("Failed to retrieve cluster location, falling back to local zone: %s", err)

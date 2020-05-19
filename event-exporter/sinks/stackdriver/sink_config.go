@@ -17,11 +17,9 @@ limitations under the License.
 package stackdriver
 
 import (
-	"errors"
 	"fmt"
+	"github.com/GoogleCloudPlatform/k8s-stackdriver/event-exporter/utils"
 	"time"
-
-	"cloud.google.com/go/compute/metadata"
 )
 
 const (
@@ -42,11 +40,7 @@ type sdSinkConfig struct {
 }
 
 func newGceSdSinkConfig() (*sdSinkConfig, error) {
-	if !metadata.OnGCE() {
-		return nil, errors.New("not running on GCE, which is not supported for Stackdriver sink")
-	}
-
-	projectID, err := metadata.ProjectID()
+	projectID, err := utils.GetProjectID()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get project id: %v", err)
 	}
